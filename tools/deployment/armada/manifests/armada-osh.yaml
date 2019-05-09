@@ -1102,6 +1102,8 @@ data:
             password: ${NEUTRON_USER_PASSWORD}
           nova:
             password: ${NOVA_USER_PASSWORD}
+          test:
+            password: ${KEYSTONE_ADMIN_PASSWORD}
       oslo_db:
         auth:
           admin:
