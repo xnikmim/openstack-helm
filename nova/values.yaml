@@ -1959,7 +1959,7 @@ pod:
   mandatory_access_control:
     type: apparmor
     nova-compute-default:
-      nova-compute-default: localhost/docker-default
+      nova-compute-default: unconfined
   user:
     nova:
       uid: 42424
