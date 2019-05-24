@@ -214,6 +214,9 @@ data:
   install:
     no_hooks: False
   upgrade:
+    options:
+      force: true
+      recreate_pods: true
     no_hooks: False
     pre:
       delete:
@@ -1440,6 +1443,47 @@ data:
   dependencies:
     - helm-toolkit
 ---
+schema: armada/Chart/v1
+metadata:
+  schema: metadata/Document/v1
+  name: tempest
+data:
+  chart_name: tempest
+  release: tempest
+  namespace: openstack
+  wait:
+    timeout: 1800
+    labels:
+      release_group: osh-tempest
+  install:
+    no_hooks: False
+  upgrade:
+    no_hooks: False
+    pre:
+      delete:
+        - type: job
+          labels:
+            release_group: osh-tempest
+  values:
+    release_uuid: ${RELEASE_UUID}
+    endpoints:
+      identity:
+        auth:
+          admin:
+            password: ${KEYSTONE_ADMIN_PASSWORD}
+          tempest:
+            password: ${TEMPEST_USER_PASSWORD}
+    labels:
+      node_selector_key: openstack-control-plane
+      node_selector_value: enabled
+  source:
+    type: local
+    location: ${OSH_PATH}
+    subpath: tempest
+    reference: master
+  dependencies:
+    - helm-toolkit    
+---
 schema: armada/ChartGroup/v1
 metadata:
   schema: metadata/Document/v1
@@ -1563,6 +1607,16 @@ data:
   chart_group:
     - prometheus-openstack-exporter
 ---
+schema: armada/ChartGroup/v1
+metadata:
+  schema: metadata/Document/v1
+  name: openstack-tempest
+data:
+  description: 'Deploy Openstack Tempest'
+  sequenced: False
+  chart_group:
+    - tempest
+---
 schema: armada/Manifest/v1
 metadata:
   schema: metadata/Document/v1
@@ -1582,3 +1636,4 @@ data:
     - openstack-compute-kit
     - openstack-heat
     - prometheus-openstack-exporter
+    - openstack-tempest

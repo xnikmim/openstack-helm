@@ -29,13 +29,6 @@ export TUNNEL_DEVICE=$(ip -4 route list 0/0 | awk '{ print $5; exit }')
 export OSH_INFRA_PATH
 export OSH_PATH
 
-if [ "x${ID}" == "xubuntu" ] && \
-   [ "$(uname -r | awk -F "." '{ print $2 }')" -lt "5" ]; then
-  export CRUSH_TUNABLES=hammer
-else
-  export CRUSH_TUNABLES=null
-fi
-
 # NOTE(srwilkers): We add this here due to envsubst expanding the ${tag} placeholder in
 # fluentd's configuration. This ensures the placeholder value gets rendered appropriately
 export tag='${tag}'
