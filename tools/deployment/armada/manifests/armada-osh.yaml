@@ -45,10 +45,6 @@ data:
       error_server:
         node_selector_key: openstack-control-plane
         node_selector_value: enabled
-    pod:
-      replicas:
-        error_page: 2
-        ingress: 2
   source:
     type: local
     location: ${OSH_INFRA_PATH}
@@ -380,9 +376,6 @@ data:
       job:
         node_selector_key: openstack-control-plane
         node_selector_value: enabled
-    pod:
-      replicas:
-        api: 2
   source:
     type: local
     location: ${OSH_PATH}
@@ -589,10 +582,6 @@ data:
       registry:
         node_selector_key: openstack-control-plane
         node_selector_value: enabled
-    pod:
-      replicas:
-        api: 2
-        registry: 2
     # NOTE(portdirect): glance APIv1 is required for heat in Newton
     conf:
       glance:
@@ -678,12 +667,6 @@ data:
       volume:
         node_selector_key: openstack-control-plane
         node_selector_value: enabled
-    pod:
-      replicas:
-        api: 2
-        volume: 1
-        scheduler: 1
-        backup: 1
     conf:
       logging:
         loggers:
@@ -964,15 +947,6 @@ data:
       test:
         node_selector_key: openstack-control-plane
         node_selector_value: enabled
-    pod:
-      replicas:
-        api_metadata: 1
-        placement: 2
-        osapi: 2
-        conductor: 2
-        consoleauth: 2
-        scheduler: 2
-        novncproxy: 1
     conf:
       logging:
         loggers:
@@ -1122,9 +1096,6 @@ data:
           neutron:
             username: neutron-rabbitmq-user
             password: ${NEUTRON_RABBITMQ_USER_PASSWORD}
-    pod:
-      replicas:
-        server: 2
     labels:
       agent:
         dhcp:
@@ -1388,12 +1359,6 @@ data:
       job:
         node_selector_key: openstack-control-plane
         node_selector_value: enabled
-    pod:
-      replicas:
-        api: 2
-        cfn: 2
-        cloudwatch: 2
-        engine: 2
   source:
     type: local
     location: ${OSH_PATH}
@@ -1442,47 +1407,6 @@ data:
     reference: master
   dependencies:
     - helm-toolkit
----
-schema: armada/Chart/v1
-metadata:
-  schema: metadata/Document/v1
-  name: tempest
-data:
-  chart_name: tempest
-  release: tempest
-  namespace: openstack
-  wait:
-    timeout: 1800
-    labels:
-      release_group: osh-tempest
-  install:
-    no_hooks: False
-  upgrade:
-    no_hooks: False
-    pre:
-      delete:
-        - type: job
-          labels:
-            release_group: osh-tempest
-  values:
-    release_uuid: ${RELEASE_UUID}
-    endpoints:
-      identity:
-        auth:
-          admin:
-            password: ${KEYSTONE_ADMIN_PASSWORD}
-          tempest:
-            password: ${TEMPEST_USER_PASSWORD}
-    labels:
-      node_selector_key: openstack-control-plane
-      node_selector_value: enabled
-  source:
-    type: local
-    location: ${OSH_PATH}
-    subpath: tempest
-    reference: master
-  dependencies:
-    - helm-toolkit    
 ---
 schema: armada/ChartGroup/v1
 metadata:
@@ -1607,16 +1531,6 @@ data:
   chart_group:
     - prometheus-openstack-exporter
 ---
-schema: armada/ChartGroup/v1
-metadata:
-  schema: metadata/Document/v1
-  name: openstack-tempest
-data:
-  description: 'Deploy Openstack Tempest'
-  sequenced: False
-  chart_group:
-    - tempest
----
 schema: armada/Manifest/v1
 metadata:
   schema: metadata/Document/v1
@@ -1636,4 +1550,3 @@ data:
     - openstack-compute-kit
     - openstack-heat
     - prometheus-openstack-exporter
-    - openstack-tempest
